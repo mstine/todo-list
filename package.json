@@ -1,0 +1,31 @@
+{
+  "name": "todo-list",
+  "version": "0.1.0",
+  "description": "SPOring Todo List App",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mstine/todo-list.git"
+  },
+  "author": "Matt Stine",
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/mstine/todo-list/issues"
+  },
+  "homepage": "https://github.com/mstine/todo-list",
+  "dependencies": {
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
+    "webpack": "^1.12.2",
+    "react-bootstrap": "^0.31.0"
+  },
+  "scripts": {
+    "watch": "webpack --watch -d"
+  },
+  "devDependencies": {
+    "babel-core": "^6.18.2",
+    "babel-loader": "^6.2.7",
+    "babel-polyfill": "^6.16.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.16.0"
+  }
+}
