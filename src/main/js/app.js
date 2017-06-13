@@ -173,27 +173,16 @@ class AddTodoList extends React.Component {
 class TodoLists extends React.Component {
     constructor(props) {
         super(props);
-        this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this);
-        this.handleUpdateButtonClick = this.handleUpdateButtonClick.bind(this);
-        this.handleListNameChange = this.handleListNameChange.bind(this);
+
         this.handleListNameClick = this.handleListNameClick.bind(this);
         this.renderNameOrEditField = this.renderNameOrEditField.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.toggleEditingOff = this.toggleEditingOff.bind(this);
+
         this.state = {editing: ''};
     }
 
-    handleSubmit(e, listId) {
-        e.preventDefault();
-        this.handleUpdateButtonClick(listId);
-    }
-
-    handleUpdateButtonClick(listId) {
-        this.props.onUpdateList(listId);
+    toggleEditingOff() {
         this.setState({editing: ''});
-    }
-
-    handleDeleteButtonClick(listId) {
-        this.props.onDeleteList(listId);
     }
 
     handleListNameClick(listId, listName) {
@@ -201,32 +190,16 @@ class TodoLists extends React.Component {
         this.setState({editing: listId});
     }
 
-    handleListNameChange(e) {
-        this.props.onListNameChange(e.target.value);
-    }
-
     renderNameOrEditField(list) {
         if (this.state.editing === list.id) {
             return (
-                <form onSubmit={(e) => this.handleSubmit(e, list.id)}>
-                    <FormGroup>
-                        <InputGroup>
-                            <FormControl
-                                type="text"
-                                placeholder="Enter text"
-                                value={this.props.updatedListName}
-                                onChange={this.handleListNameChange}
-                            />
-                            <InputGroup.Button>
-                                <Button onClick={() => this.handleUpdateButtonClick(list.id)}>Update</Button>
-                            </InputGroup.Button>
-                            <InputGroup.Button>
-                                <Button bsStyle="danger"
-                                        onClick={() => this.handleDeleteButtonClick(list.id)}>Delete</Button>
-                            </InputGroup.Button>
-                        </InputGroup>
-                    </FormGroup>
-                </form>
+                <EditUpdateDeleteObject object={list}
+                                        updatedName={this.props.updatedListName}
+                                        onDeleteObject={this.props.onDeleteList}
+                                        onUpdateObject={this.props.onUpdateList}
+                                        onNameChange={this.props.onListNameChange}
+                                        toggleOff={this.toggleEditingOff}
+                />
             );
         } else {
             return (
@@ -250,6 +223,62 @@ class TodoLists extends React.Component {
             </div>
         );
     }
+}
+
+class EditUpdateDeleteObject extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleNameChange = this.handleNameChange.bind(this);
+        this.handleUpdateButtonClick = this.handleUpdateButtonClick.bind(this);
+        this.handleDeleteButtonClick = this.handleDeleteButtonClick.bind(this);
+    }
+
+    handleSubmit(e, objId) {
+        e.preventDefault();
+        this.handleUpdateButtonClick(objId);
+    }
+
+    handleNameChange(e) {
+        this.props.onNameChange(e.target.value);
+    }
+
+    handleUpdateButtonClick(objId) {
+        this.props.onUpdateObject(objId);
+        this.props.toggleOff();
+    }
+
+    handleDeleteButtonClick(objId) {
+        this.props.onDeleteObject(objId);
+    }
+
+    render() {
+        let obj = this.props.object;
+        return (
+            <form onSubmit={(e) => this.handleSubmit(e, obj.id)}>
+                <FormGroup>
+                    <InputGroup>
+                        <FormControl
+                            type="text"
+                            placeholder="Enter text"
+                            value={this.props.updatedName}
+                            onChange={this.handleNameChange}
+                        />
+                        <InputGroup.Button>
+                            <Button onClick={() => this.handleUpdateButtonClick(obj.id)}>Update</Button>
+                        </InputGroup.Button>
+                        <InputGroup.Button>
+                            <Button bsStyle="danger"
+                                    onClick={() => this.handleDeleteButtonClick(obj.id)}>Delete</Button>
+                        </InputGroup.Button>
+                    </InputGroup>
+                </FormGroup>
+            </form>
+        );
+    }
+
 }
 
 class TodoList extends React.Component {
