@@ -204,7 +204,7 @@ class TodoLists extends React.Component {
         } else {
             return (
                 <h3 onClick={() => this.handleListNameClick(list.id, list.name)}>{list.name} <Button bsStyle="danger"
-                                                                                                     onClick={() => this.handleDeleteButtonClick(list.id)}>Delete</Button>
+                                                                                                     onClick={() => this.props.onDeleteList(list.id)}>Delete</Button>
                 </h3>
             )
         }
