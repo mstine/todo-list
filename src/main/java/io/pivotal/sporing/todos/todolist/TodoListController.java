@@ -18,11 +18,22 @@ public class TodoListController {
     @Autowired
     private TodoListRepository repository;
 
+    @Autowired
+    private TodoItemRepository itemRepository;
+
     @PostMapping("/lists")
     public ResponseEntity<TodoListCreatedResponse> create(@RequestBody TodoListRequest todoListRequest,
                                          Authentication authentication) {
         TodoList todoList = repository.save(TodoList.from(todoListRequest, getOwnerFromAuthentication(authentication)));
         return new ResponseEntity<>(TodoListCreatedResponse.from(todoList), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/lists/{id}/items")
+    public ResponseEntity<TodoItemCreatedResponse> createItem(@PathVariable("id") Long id, @RequestBody TodoItemRequest todoItemRequest,
+                                                              Authentication authentication) {
+        TodoList todoList = repository.findOneByIdAndOwner(id, getOwnerFromAuthentication(authentication));
+        TodoItem todoItem = itemRepository.save(TodoItem.from(todoItemRequest, todoList));
+        return new ResponseEntity<>(TodoItemCreatedResponse.from(todoItem), HttpStatus.CREATED);
     }
 
     private User getOwnerFromAuthentication(Authentication authentication) {

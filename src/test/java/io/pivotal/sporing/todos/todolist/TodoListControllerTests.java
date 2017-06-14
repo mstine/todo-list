@@ -1,7 +1,6 @@
 package io.pivotal.sporing.todos.todolist;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.tools.javac.comp.Todo;
 import io.pivotal.sporing.todos.TestWebSecurityConfig;
 import io.pivotal.sporing.todos.user.User;
 import org.junit.Test;
@@ -22,9 +21,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -48,6 +45,9 @@ public class TodoListControllerTests {
     @MockBean
     private TodoListRepository repository;
 
+    @MockBean
+    private TodoItemRepository itemRepository;
+
     @Test
     @WithUserDetails("matt.stine@gmail.com")
     public void testCreate() throws Exception {
@@ -69,6 +69,37 @@ public class TodoListControllerTests {
                 .andExpect(content().json(mapper.writeValueAsString(response)));
 
         verify(repository).save(any(TodoList.class));
+    }
+
+    @Test
+    @WithUserDetails("matt.stine@gmail.com")
+    public void testCreateItem() throws Exception {
+        String requestBody = mapper.writeValueAsString(
+                new TodoItemRequest("buy milk"));
+
+        TodoItemCreatedResponse response = new TodoItemCreatedResponse("1", "buy milk");
+
+        TodoList todoList = new TodoList("chores", new User());
+        todoList.setId(1L);
+
+        when(repository.findOneByIdAndOwner(eq(1L), any(User.class)))
+                .thenReturn(todoList);
+
+        TodoItem todoItem = new TodoItem("buy milk", todoList);
+        todoItem.setId(1L);
+
+        when(itemRepository.save(any(TodoItem.class))).thenReturn(todoItem);
+
+        mvc.perform(post("/lists/{id}/items", "1")
+                .content(requestBody)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(mapper.writeValueAsString(response)));
+
+        verify(itemRepository).save(any(TodoItem.class));
+
+
     }
 
     @Test

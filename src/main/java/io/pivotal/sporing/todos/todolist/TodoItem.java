@@ -3,6 +3,7 @@ package io.pivotal.sporing.todos.todolist;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -12,6 +13,7 @@ import javax.persistence.*;
 @Entity
 @Data
 @NoArgsConstructor
+@ToString(exclude = {"list"})
 public class TodoItem {
     @Id
     @GeneratedValue
@@ -25,4 +27,12 @@ public class TodoItem {
     @JsonIgnore
     private TodoList list;
 
+    public TodoItem(String name, TodoList list) {
+        this.name = name;
+        this.list = list;
+    }
+
+    public static TodoItem from(TodoItemRequest todoItemRequest, TodoList todoList) {
+        return new TodoItem(todoItemRequest.getName(), todoList);
+    }
 }

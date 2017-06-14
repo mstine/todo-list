@@ -15,12 +15,14 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {todoLists: [], newListName: '', updatedListName: ''};
+        this.state = {todoLists: [], newListName: '', updatedListName: '', todoItemAdders: []};
         this.handleNewListNameChange = this.handleNewListNameChange.bind(this);
         this.handleUpdatedListNameChange = this.handleUpdatedListNameChange.bind(this);
+        this.handleItemAdderNameChange = this.handleItemAdderNameChange.bind(this);
         this.handleNewList = this.handleNewList.bind(this);
         this.handleDeleteList = this.handleDeleteList.bind(this);
         this.handleUpdateList = this.handleUpdateList.bind(this);
+        this.handleNewItem = this.handleNewItem.bind(this);
     }
 
     componentDidMount() {
@@ -31,7 +33,17 @@ class App extends React.Component {
             return response.json();
 
         }).then(json => {
-            this.setState({todoLists: json});
+            this.setState({todoLists: json, todoItemAdders: new Array(json.length).fill('')});
+        });
+    }
+
+    handleItemAdderNameChange(index, name) {
+        this.setState(function (prevState, props) {
+            let myTodoItemAdders = prevState.todoItemAdders;
+            myTodoItemAdders[index] = name;
+            return {
+                todoItemAdders: myTodoItemAdders
+            };
         });
     }
 
@@ -63,6 +75,37 @@ class App extends React.Component {
                 return {
                     todoLists: myTodoLists,
                     newListName: ''
+                };
+            });
+        });
+    }
+
+    handleNewItem(index, listId) {
+        let newItem = {
+            name: this.state.todoItemAdders[index]
+        }
+        fetch('/lists/'+listId+'/items', {
+            method: 'POST',
+            credentials: 'same-origin',
+            body: JSON.stringify(newItem),
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            })
+        }).then(response => {
+            return response.json();
+        }).then(json => {
+            this.setState(function (prevState, props) {
+                let myTodoLists = prevState.todoLists;
+                myTodoLists.forEach(function (todoList) {
+                    if (todoList.id == listId) {
+                        todoList.items.push(json);
+                    }
+                });
+                let myTodoItemAdders = prevState.todoItemAdders;
+                myTodoItemAdders[index] = '';
+                return {
+                    todoLists: myTodoLists,
+                    todoItemAdders: myTodoItemAdders
                 };
             });
         });
@@ -116,10 +159,13 @@ class App extends React.Component {
         return (
             <div>
                 <TodoLists lists={this.state.todoLists}
+                           itemAdders={this.state.todoItemAdders}
                            updatedListName={this.state.updatedListName}
                            onDeleteList={this.handleDeleteList}
                            onUpdateList={this.handleUpdateList}
                            onListNameChange={this.handleUpdatedListNameChange}
+                           onItemAdderNameChange={this.handleItemAdderNameChange}
+                           onAddItem={this.handleNewItem}
                 />
                 <AddTodoList listName={newListName}
                              onAddList={this.handleNewList}
@@ -211,10 +257,15 @@ class TodoLists extends React.Component {
     }
 
     render() {
-        var todoLists = this.props.lists.map(list =>
+        var todoLists = this.props.lists.map((list, index) =>
             <div key={list.id}>
                 {this.renderNameOrEditField(list)}
-                <TodoList items={list.items}/>
+                <TodoList index={index}
+                          listId={list.id}
+                          items={list.items}
+                          onItemAdderNameChange={this.props.onItemAdderNameChange}
+                          onAddItem={this.props.onAddItem}
+                          itemAdderName={this.props.itemAdders[index]} />
             </div>
         );
         return (
@@ -282,6 +333,7 @@ class EditUpdateDeleteObject extends React.Component {
 }
 
 class TodoList extends React.Component {
+
     render() {
         var items = this.props.items.map(item =>
             <ListGroupItem key={item.id}>
@@ -289,9 +341,26 @@ class TodoList extends React.Component {
             </ListGroupItem>
         );
         return (
-            <ListGroup>
-                {items}
-            </ListGroup>
+            <div>
+                <form>
+                    <FormGroup>
+                        <InputGroup>
+                            <FormControl
+                                type="text"
+                                placeholder="Enter text"
+                                value={this.props.itemAdderName}
+                                onChange={(e) => this.props.onItemAdderNameChange(this.props.index, e.target.value)}
+                            />
+                            <InputGroup.Button>
+                                <Button onClick={(e) => this.props.onAddItem(this.props.index, this.props.listId)}>Add</Button>
+                            </InputGroup.Button>
+                        </InputGroup>
+                    </FormGroup>
+                </form>
+                <ListGroup>
+                    {items}
+                </ListGroup>
+            </div>
         );
     }
 }

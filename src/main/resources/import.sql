@@ -14,7 +14,6 @@ insert into TODO_LIST(ID, NAME, OWNER_USER_ID) values (2, 'Test List 2', 1);
 insert into TODO_ITEM(ID, NAME, TODO_LIST_ID, COMPLETED) values (1, 'Item 1', 1, FALSE);
 insert into TODO_ITEM(ID, NAME, TODO_LIST_ID, COMPLETED) values (2, 'Item 2', 1, FALSE);
 insert into TODO_ITEM(ID, NAME, TODO_LIST_ID, COMPLETED) values (3, 'Item 3', 1, FALSE);
-insert into TODO_ITEM(ID, NAME, TODO_LIST_ID, COMPLETED) values (7, 'Item 3', 1, FALSE);
 
 insert into TODO_ITEM(ID, NAME, TODO_LIST_ID, COMPLETED) values (4, 'Item A', 2, FALSE);
 insert into TODO_ITEM(ID, NAME, TODO_LIST_ID, COMPLETED) values (5, 'Item B', 2, FALSE);
