@@ -333,6 +333,16 @@ class EditUpdateDeleteObject extends React.Component {
 }
 
 class TodoList extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    handleSubmit(e) {
+        e.preventDefault();
+        this.props.onAddItem(this.props.index, this.props.listId);
+    }
 
     render() {
         var items = this.props.items.map(item =>
@@ -342,7 +352,7 @@ class TodoList extends React.Component {
         );
         return (
             <div>
-                <form>
+                <form onSubmit={this.handleSubmit}>
                     <FormGroup>
                         <InputGroup>
                             <FormControl
