@@ -85,7 +85,7 @@ public class TodoListControllerTests {
         when(repository.findOneByIdAndOwner(eq(1L), any(User.class)))
                 .thenReturn(todoList);
 
-        TodoItem todoItem = new TodoItem("buy milk", todoList);
+        TodoItem todoItem = new TodoItem("buy milk", todoList, new User());
         todoItem.setId(1L);
 
         when(itemRepository.save(any(TodoItem.class))).thenReturn(todoItem);
@@ -98,8 +98,6 @@ public class TodoListControllerTests {
                 .andExpect(content().json(mapper.writeValueAsString(response)));
 
         verify(itemRepository).save(any(TodoItem.class));
-
-
     }
 
     @Test
@@ -141,6 +139,16 @@ public class TodoListControllerTests {
 
     @Test
     @WithUserDetails("matt.stine@gmail.com")
+    public void testDeleteItem() throws Exception {
+        mvc.perform(delete("/lists/{id}/items/{itemId}", 1L, 1L))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+
+        verify(itemRepository).deleteByIdAndListAndOwner(eq(1L), any(TodoList.class), any(User.class));
+    }
+
+    @Test
+    @WithUserDetails("matt.stine@gmail.com")
     public void testUpdate() throws Exception {
         User owner = new User();
         TodoList todoList = new TodoList("chores", owner);
@@ -158,5 +166,28 @@ public class TodoListControllerTests {
 
         TodoList updatedTodoList = TodoList.from(request, owner);
         verify(repository).save(argThat(samePropertyValuesAs(updatedTodoList)));
+    }
+
+    @Test
+    @WithUserDetails("matt.stine@gmail.com")
+    public void testUpdateItem() throws Exception {
+        User owner = new User();
+        TodoList list = new TodoList();
+        list.setOwner(owner);
+
+        TodoItem todoItem = new TodoItem("buy milk", list, owner);
+        when(itemRepository.findOneByIdAndListAndOwner(eq(1L), any(TodoList.class), any(User.class))).thenReturn(todoItem);
+
+        TodoItemRequest request = new TodoItemRequest("Buy Milk");
+        String requestBody = mapper.writeValueAsString(request);
+
+        mvc.perform(put("/lists/{id}/items/{itemId}", 1L, 1L)
+                .content(requestBody)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        TodoItem updatedTodoItem = TodoItem.from(request, list);
+        verify(itemRepository).save(argThat(samePropertyValuesAs(updatedTodoItem)));
     }
 }

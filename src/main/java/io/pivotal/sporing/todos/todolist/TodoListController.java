@@ -47,23 +47,46 @@ public class TodoListController {
     }
 
     @GetMapping("/lists/{id}")
-    public ResponseEntity<TodoList> get(@PathVariable("id") Long id, Authentication authentication) {
+    public ResponseEntity<TodoList> get(@PathVariable("id") Long id,
+                                        Authentication authentication) {
         return new ResponseEntity<>(repository.findOneByIdAndOwner(id, getOwnerFromAuthentication(authentication)), HttpStatus.OK);
     }
 
     @DeleteMapping("/lists/{id}")
-    public ResponseEntity<String> delete(@PathVariable("id") Long id, Authentication authentication) {
+    public ResponseEntity<String> delete(@PathVariable("id") Long id,
+                                         Authentication authentication) {
         repository.deleteByIdAndOwner(id, getOwnerFromAuthentication(authentication));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @DeleteMapping("/lists/{id}/items/{itemId}")
+    public ResponseEntity<String> delete(@PathVariable("id") Long id,
+                                         @PathVariable("itemId") Long itemId,
+                                         Authentication authentication) {
+        TodoList todoList = repository.findOneByIdAndOwner(id, getOwnerFromAuthentication(authentication));
+        itemRepository.deleteByIdAndListAndOwner(itemId, todoList, getOwnerFromAuthentication(authentication));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @PutMapping("/lists/{id}")
-    public ResponseEntity<String> update(@PathVariable("id") Long id, @RequestBody TodoListRequest request, Authentication authentication) {
+    public ResponseEntity<String> update(@PathVariable("id") Long id,
+                                         @RequestBody TodoListRequest request,
+                                         Authentication authentication) {
         TodoList todoList = repository.findOneByIdAndOwner(id, getOwnerFromAuthentication(authentication));
         todoList.merge(request);
         repository.save(todoList);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-
+    @PutMapping("/lists/{id}/items/{itemId}")
+    public ResponseEntity<String> updateItem(@PathVariable("id") Long id,
+                                             @PathVariable("itemId") Long itemId,
+                                             @RequestBody TodoItemRequest request,
+                                             Authentication authentication) {
+        TodoList todoList = repository.findOneByIdAndOwner(id, getOwnerFromAuthentication(authentication));
+        TodoItem todoItem = itemRepository.findOneByIdAndListAndOwner(itemId, todoList, getOwnerFromAuthentication(authentication));
+        todoItem.merge(request);
+        itemRepository.save(todoItem);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

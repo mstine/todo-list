@@ -84,7 +84,7 @@ class App extends React.Component {
         let newItem = {
             name: this.state.todoItemAdders[index]
         }
-        fetch('/lists/'+listId+'/items', {
+        fetch('/lists/' + listId + '/items', {
             method: 'POST',
             credentials: 'same-origin',
             body: JSON.stringify(newItem),
@@ -265,7 +265,7 @@ class TodoLists extends React.Component {
                           items={list.items}
                           onItemAdderNameChange={this.props.onItemAdderNameChange}
                           onAddItem={this.props.onAddItem}
-                          itemAdderName={this.props.itemAdders[index]} />
+                          itemAdderName={this.props.itemAdders[index]}/>
             </div>
         );
         return (
@@ -337,6 +337,30 @@ class TodoList extends React.Component {
         super(props);
 
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleItemNameClick = this.handleItemNameClick.bind(this);
+        this.handleItemNameChange = this.handleItemNameChange.bind(this);
+        this.handleUpdateItem = this.handleUpdateItem.bind(this);
+        this.handleDeleteItem = this.handleDeleteItem.bind(this);
+        this.toggleEditingOff = this.toggleEditingOff.bind(this);
+
+        this.state = {editing: '', updatedItemName: '', items: []};
+    }
+
+    componentDidMount() {
+        this.setState({items: this.props.items});
+    }
+
+    toggleEditingOff() {
+        this.setState({editing: ''});
+    }
+
+    handleItemNameClick(itemId, itemName) {
+        this.handleItemNameChange(itemName);
+        this.setState({editing: itemId});
+    }
+
+    handleItemNameChange(itemName) {
+        this.setState({updatedItemName: itemName});
     }
 
     handleSubmit(e) {
@@ -344,12 +368,77 @@ class TodoList extends React.Component {
         this.props.onAddItem(this.props.index, this.props.listId);
     }
 
+    handleDeleteItem(listId, itemId) {
+        fetch('/lists/'+listId+'/items/'+itemId, {
+            method: 'DELETE',
+            credentials: 'same-origin'
+        }).then(response => {
+            this.setState(function (prevState, props) {
+                let myItems = prevState.items.filter(item => item.id !== itemId);
+                return {
+                    items: myItems
+                };
+            });
+        })
+    }
+
+    handleUpdateItem(listId, itemId) {
+        let updatedItem = {
+            name: this.state.updatedItemName
+        }
+        fetch('/lists/'+listId+'/items/'+itemId, {
+            method: 'PUT',
+            credentials: 'same-origin',
+            body: JSON.stringify(updatedItem),
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            })
+        }).then(response => {
+            this.setState(function (prevState, props) {
+                let myItems = prevState.items;
+                myItems.forEach(function (item) {
+                    if (item.id === itemId) {
+                        item.name = prevState.updatedItemName;
+                    }
+                });
+                return {
+                    items: myItems,
+                    updatedItemName: ''
+                }
+            });
+        })
+    }
+
     render() {
-        var items = this.props.items.map(item =>
-            <ListGroupItem key={item.id}>
-                {item.name}
-            </ListGroupItem>
-        );
+        let editing = this.state.editing;
+        let updatedItemName = this.state.updatedItemName;
+        let handleItemNameClick = this.handleItemNameClick;
+        let handleItemNameChange = this.handleItemNameChange;
+        let handleDeleteItem = this.handleDeleteItem;
+        let handleUpdateItem = this.handleUpdateItem;
+        let toggleEditingOff = this.toggleEditingOff;
+        let listId = this.props.listId;
+        let items = this.state.items.map(function (item) {
+            if (editing === item.id) {
+                return (
+                    <ListGroupItem key={item.id}>
+                        <EditUpdateDeleteObject object={item}
+                                                updatedName={updatedItemName}
+                                                onDeleteObject={(itemId) => handleDeleteItem(listId, itemId)}
+                                                onUpdateObject={(itemId) => handleUpdateItem(listId, itemId)}
+                                                onNameChange={handleItemNameChange}
+                                                toggleOff={toggleEditingOff}/>
+                    </ListGroupItem>
+                );
+            } else {
+                return (
+                    <ListGroupItem onClick={() => handleItemNameClick(item.id, item.name)}
+                                   key={item.id}>
+                        {item.name}
+                    </ListGroupItem>
+                );
+            }
+        });
         return (
             <div>
                 <form onSubmit={this.handleSubmit}>
@@ -362,7 +451,8 @@ class TodoList extends React.Component {
                                 onChange={(e) => this.props.onItemAdderNameChange(this.props.index, e.target.value)}
                             />
                             <InputGroup.Button>
-                                <Button onClick={(e) => this.props.onAddItem(this.props.index, this.props.listId)}>Add</Button>
+                                <Button
+                                    onClick={(e) => this.props.onAddItem(this.props.index, this.props.listId)}>Add</Button>
                             </InputGroup.Button>
                         </InputGroup>
                     </FormGroup>
