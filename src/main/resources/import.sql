@@ -1,8 +1,8 @@
 insert into ROLE(ID,NAME) values (1, 'USER');
 insert into ROLE(ID,NAME) values (2, 'ACTUATOR');
 
-insert into USER(ID, ACCOUNT_NON_EXPIRED, ACCOUNT_NON_LOCKED, CREDENTIALS_NON_EXPIRED, EMAIL, ENABLED, NAME, PASSWORD) values (1, TRUE, TRUE, TRUE, 'matt.stine@gmail.com', TRUE, 'Matt Stine (Personal)', 'password');
-insert into USER(ID, ACCOUNT_NON_EXPIRED, ACCOUNT_NON_LOCKED, CREDENTIALS_NON_EXPIRED, EMAIL, ENABLED, NAME, PASSWORD) values (2, TRUE, TRUE, TRUE, 'mstine@pivotal.io', TRUE, 'Matt Stine (Pivotal)', 'password');
+insert into USER(ID, ACCOUNT_NON_EXPIRED, ACCOUNT_NON_LOCKED, CREDENTIALS_NON_EXPIRED, EMAIL, ENABLED, NAME, PASSWORD) values (1, TRUE, TRUE, TRUE, 'joeuser@example.com', TRUE, 'Joe User', 'password');
+insert into USER(ID, ACCOUNT_NON_EXPIRED, ACCOUNT_NON_LOCKED, CREDENTIALS_NON_EXPIRED, EMAIL, ENABLED, NAME, PASSWORD) values (2, TRUE, TRUE, TRUE, 'janeuser@example.com', TRUE, 'Jane User (Pivotal)', 'password');
 
 insert into USER_ROLES(USER_ID, ROLES_ID) values (1, 1);
 insert into USER_ROLES(USER_ID, ROLES_ID) values (1, 2);

@@ -49,7 +49,7 @@ public class TodoListControllerTests {
     private TodoItemRepository itemRepository;
 
     @Test
-    @WithUserDetails("matt.stine@gmail.com")
+    @WithUserDetails("joeuser@example.com")
     public void testCreate() throws Exception {
         String requestBody = mapper.writeValueAsString(
                 new TodoListRequest("chores"));
@@ -72,7 +72,7 @@ public class TodoListControllerTests {
     }
 
     @Test
-    @WithUserDetails("matt.stine@gmail.com")
+    @WithUserDetails("joeuser@example.com")
     public void testCreateItem() throws Exception {
         String requestBody = mapper.writeValueAsString(
                 new TodoItemRequest("buy milk"));
@@ -101,7 +101,7 @@ public class TodoListControllerTests {
     }
 
     @Test
-    @WithUserDetails("matt.stine@gmail.com")
+    @WithUserDetails("joeuser@example.com")
     public void testList() throws Exception {
         List<TodoList> results = Arrays.asList(new TodoList("chores", null), new TodoList("errands", null));
         when(repository.findAllByOwner(any(User.class))).thenReturn(results);
@@ -114,7 +114,7 @@ public class TodoListControllerTests {
     }
 
     @Test
-    @WithUserDetails("matt.stine@gmail.com")
+    @WithUserDetails("joeuser@example.com")
     public void testGet() throws Exception {
         User owner = new User();
         TodoList todoList = new TodoList("chores", owner);
@@ -128,7 +128,7 @@ public class TodoListControllerTests {
     }
 
     @Test
-    @WithUserDetails("matt.stine@gmail.com")
+    @WithUserDetails("joeuser@example.com")
     public void testDelete() throws Exception {
         mvc.perform(delete("/lists/{id}", 1L))
                 .andExpect(status().isNoContent())
@@ -138,7 +138,7 @@ public class TodoListControllerTests {
     }
 
     @Test
-    @WithUserDetails("matt.stine@gmail.com")
+    @WithUserDetails("joeuser@example.com")
     public void testDeleteItem() throws Exception {
         mvc.perform(delete("/lists/{id}/items/{itemId}", 1L, 1L))
                 .andExpect(status().isNoContent())
@@ -148,7 +148,7 @@ public class TodoListControllerTests {
     }
 
     @Test
-    @WithUserDetails("matt.stine@gmail.com")
+    @WithUserDetails("joeuser@example.com")
     public void testUpdate() throws Exception {
         User owner = new User();
         TodoList todoList = new TodoList("chores", owner);
@@ -169,7 +169,7 @@ public class TodoListControllerTests {
     }
 
     @Test
-    @WithUserDetails("matt.stine@gmail.com")
+    @WithUserDetails("joeuser@example.com")
     public void testUpdateItem() throws Exception {
         User owner = new User();
         TodoList list = new TodoList();
