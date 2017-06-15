@@ -45,5 +45,6 @@ public class TodoItem {
 
     public void merge(TodoItemRequest request) {
         this.name = request.getName();
+        this.completed = request.isCompleted();
     }
 }

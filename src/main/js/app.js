@@ -10,6 +10,7 @@ const FormGroup = require('react-bootstrap').FormGroup;
 const ControlLabel = require('react-bootstrap').ControlLabel;
 const Button = require('react-bootstrap').Button;
 const InputGroup = require('react-bootstrap').InputGroup;
+const Checkbox = require('react-bootstrap').Checkbox;
 
 class App extends React.Component {
 
@@ -342,6 +343,7 @@ class TodoList extends React.Component {
         this.handleUpdateItem = this.handleUpdateItem.bind(this);
         this.handleDeleteItem = this.handleDeleteItem.bind(this);
         this.toggleEditingOff = this.toggleEditingOff.bind(this);
+        this.handleItemCheckboxChange = this.handleItemCheckboxChange.bind(this);
 
         this.state = {editing: '', updatedItemName: '', items: []};
     }
@@ -369,7 +371,7 @@ class TodoList extends React.Component {
     }
 
     handleDeleteItem(listId, itemId) {
-        fetch('/lists/'+listId+'/items/'+itemId, {
+        fetch('/lists/' + listId + '/items/' + itemId, {
             method: 'DELETE',
             credentials: 'same-origin'
         }).then(response => {
@@ -386,7 +388,7 @@ class TodoList extends React.Component {
         let updatedItem = {
             name: this.state.updatedItemName
         }
-        fetch('/lists/'+listId+'/items/'+itemId, {
+        fetch('/lists/' + listId + '/items/' + itemId, {
             method: 'PUT',
             credentials: 'same-origin',
             body: JSON.stringify(updatedItem),
@@ -406,6 +408,32 @@ class TodoList extends React.Component {
                     updatedItemName: ''
                 }
             });
+        });
+    }
+
+    handleItemCheckboxChange(listId, itemId) {
+        let itemToToggle = this.state.items.filter( item => item.id === itemId)[0];
+        itemToToggle.completed = !itemToToggle.completed;
+        fetch('/lists/' + listId + '/items/' + itemId, {
+            method: 'PUT',
+            credentials: 'same-origin',
+            body: JSON.stringify(itemToToggle),
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            })
+        }).then(response => {
+            this.setState(function (prevState, props) {
+                let myItems = prevState.items;
+                myItems.forEach(function (item) {
+                    if (item.id === itemId) {
+                        item.completed = itemToToggle.completed;
+                    }
+                });
+                return {
+                    items: myItems,
+                    updatedItemName: ''
+                }
+            });
         })
     }
 
@@ -417,6 +445,7 @@ class TodoList extends React.Component {
         let handleDeleteItem = this.handleDeleteItem;
         let handleUpdateItem = this.handleUpdateItem;
         let toggleEditingOff = this.toggleEditingOff;
+        let handleItemCheckboxChange = this.handleItemCheckboxChange;
         let listId = this.props.listId;
         let items = this.state.items.map(function (item) {
             if (editing === item.id) {
@@ -432,9 +461,13 @@ class TodoList extends React.Component {
                 );
             } else {
                 return (
-                    <ListGroupItem onClick={() => handleItemNameClick(item.id, item.name)}
-                                   key={item.id}>
-                        {item.name}
+                    <ListGroupItem key={item.id}>
+                        <Checkbox checked={item.completed}
+                            onChange={() => handleItemCheckboxChange(listId, item.id)}>
+                            <div onClick={() => handleItemNameClick(item.id, item.name)}>
+                                {item.name}
+                            </div>
+                        </Checkbox>
                     </ListGroupItem>
                 );
             }
