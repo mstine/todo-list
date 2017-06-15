@@ -3,7 +3,7 @@ Spring Boot + React Todo List
 
 Build a TODO list application
  
-== Stories:
+## Stories:
  
 * As a user, I should be able to login to my account (assume these already exist, we don’t need a new user registration flow)
 * As a user, I should be able to create a new TODO list
@@ -14,7 +14,7 @@ Build a TODO list application
 * As a user, I should be able to delete an existing item from a TODO list
 * As a user, I should be able to mark an existing item completed
  
-== Technical requirements:
+## Technical requirements:
  
 Spring Boot
 Spring Security
