@@ -12,6 +12,7 @@ import java.util.Set;
  * @author Matt Stine
  */
 @Entity
+@Table(name = "users")
 public class User implements UserDetails, Serializable {
 
     @Id

@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -12,6 +13,7 @@ import java.util.Objects;
  * @author Matt Stine
  */
 @Entity
+@Table(name="role")
 public class Role implements GrantedAuthority, Serializable {
 
     @Id

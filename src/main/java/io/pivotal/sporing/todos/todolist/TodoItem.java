@@ -15,6 +15,7 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 @ToString(exclude = {"list"})
+@Table(name="todo_item")
 public class TodoItem {
     @Id
     @GeneratedValue
