@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest
 @Import(TestWebSecurityConfig.class)
-@ActiveProfiles("test")
+@ActiveProfiles({"test"})
 public class TodoListControllerTests {
 
     @Autowired

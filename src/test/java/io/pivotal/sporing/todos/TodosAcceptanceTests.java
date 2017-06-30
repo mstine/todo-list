@@ -5,6 +5,7 @@ import org.fluentlenium.core.hook.wait.Wait;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +26,7 @@ public class TodosAcceptanceTests extends FluentTest {
     @Test
     public void testLogin() {
         goTo("http://localhost:8080");
-        $("#username").fill().with("joeuser");
+        $("#username").fill().with("joeuser@example.com");
         $("#password").fill().with("password");
         $("#sign-in").submit();
         assertThat(window().title()).contains("SPOring Todos");
